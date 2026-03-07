@@ -1,4 +1,4 @@
-from LLMInterface import LLMInterface
+from LLM.LLMInterface import LLMInterface
 
 class AIAgent:
     def __init__(

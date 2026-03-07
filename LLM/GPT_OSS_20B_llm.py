@@ -1,7 +1,7 @@
 import json
 import urllib.error
 import urllib.request
-from LLMInterface import LLMInterface
+from .LLMInterface import LLMInterface
 
 class GPT_OSS_20B_llm(LLMInterface):
 

@@ -1,7 +1,7 @@
 import importlib
 import os
 from dotenv import load_dotenv
-from LLMInterface import LLMInterface
+from .LLMInterface import LLMInterface
 
 class LLM:
 
@@ -57,7 +57,7 @@ class LLM:
 
         selected_model = f"{selected_model.upper()}_llm"
         try:
-            module = importlib.import_module(selected_model)
+            module = importlib.import_module(f"LLM.{selected_model}")
             llm_class = getattr(module, selected_model)
         except (ModuleNotFoundError, AttributeError) as exc:
             raise ValueError(f"Unsupported LLM type: {selected_model}") from exc

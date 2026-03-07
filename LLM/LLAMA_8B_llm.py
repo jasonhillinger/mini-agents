@@ -1,4 +1,4 @@
-from LLMInterface import LLMInterface
+from .LLMInterface import LLMInterface
 import urllib.error
 import urllib.request
 import json

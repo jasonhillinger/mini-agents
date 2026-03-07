@@ -1,6 +1,6 @@
 from TeamCoordinator import TeamCoordinator
 from AIAgent import AIAgent
-from LLM import LLM
+from LLM.LLM import LLM
 import yaml
 import random
 from termcolor import colored
