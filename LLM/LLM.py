@@ -55,7 +55,6 @@ class LLM:
         # Not all models may require an API key, so we won't enforce it as strictly, but we'll still read it if it's there
         api_key = (model_config.get('API_KEY') or "").strip()
 
-        selected_model = f"{selected_model.upper()}_llm"
         try:
             module = importlib.import_module(f"LLM.{selected_model}")
             llm_class = getattr(module, selected_model)

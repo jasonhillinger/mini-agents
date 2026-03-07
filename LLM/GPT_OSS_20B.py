@@ -3,7 +3,7 @@ import urllib.error
 import urllib.request
 from .LLMInterface import LLMInterface
 
-class GPT_OSS_20B_llm(LLMInterface):
+class GPT_OSS_20B(LLMInterface):
 
     def __init__(self, api_key: str, api_base_url: str, llm_model: str, max_retries: int = 3):
         super().__init__(api_key, api_base_url, llm_model, max_retries)
