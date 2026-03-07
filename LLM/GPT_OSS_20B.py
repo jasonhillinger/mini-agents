@@ -3,15 +3,17 @@ import urllib.error
 import urllib.request
 from .LLMInterface import LLMInterface
 
-class GPT_OSS_20B(LLMInterface):
 
-    def __init__(self, apiKey: str, apiBaseUrl: str, llmModel: str, maxRetries: int = 3):
+class GPT_OSS_20B(LLMInterface):
+    def __init__(
+        self, apiKey: str, apiBaseUrl: str, llmModel: str, maxRetries: int = 3
+    ):
         super().__init__(apiKey, apiBaseUrl, llmModel, maxRetries)
 
     def chatCompletion(self, messages: list[dict[str, str]]) -> str:
         return self._executePostRequest("/v1/chat/completions", messages)
-    
-    def _executePostRequest(self, endpoint: str, messages: list[dict[str, str]]) -> str: 
+
+    def _executePostRequest(self, endpoint: str, messages: list[dict[str, str]]) -> str:
         payload = {
             "model": self.getLlmModel(),
             "messages": messages,
@@ -37,5 +39,5 @@ class GPT_OSS_20B(LLMInterface):
             raise RuntimeError(
                 f"Could not reach VKS LLM. Ensure {self.getLlmModel()} is installed and you are connected to the VPN."
             ) from exc
-        
-        return data['choices'][0]['message']['content']
+
+        return data["choices"][0]["message"]["content"]

@@ -3,15 +3,22 @@ import urllib.error
 import urllib.request
 import json
 
-class LLAMA_8B(LLMInterface):
 
-    def __init__(self, apiKey: str, apiBaseUrl: str, llmModel: str, maxRetries: int = 3):
-        super().__init__(apiKey=apiKey, apiBaseUrl=apiBaseUrl, llmModel=llmModel, maxRetries=maxRetries)
+class LLAMA_8B(LLMInterface):
+    def __init__(
+        self, apiKey: str, apiBaseUrl: str, llmModel: str, maxRetries: int = 3
+    ):
+        super().__init__(
+            apiKey=apiKey,
+            apiBaseUrl=apiBaseUrl,
+            llmModel=llmModel,
+            maxRetries=maxRetries,
+        )
 
     def chatCompletion(self, messages: list[dict[str, str]]) -> str:
         return self._executePostRequest("/api/chat", messages)
-    
-    def _executePostRequest(self, endpoint: str, messages: list[dict[str, str]]) -> str: 
+
+    def _executePostRequest(self, endpoint: str, messages: list[dict[str, str]]) -> str:
         payload = {
             "model": self.getLlmModel(),
             "messages": messages,
@@ -36,6 +43,7 @@ class LLAMA_8B(LLMInterface):
                 data = json.loads(response.read().decode("utf-8"))
         except urllib.error.URLError as exc:
             raise RuntimeError(
-                f"Could not reach the LLM. Please ensure {self.getLlmModel()} is installed and that the required API key is configured. A VPN may also be required.") from exc
-        
+                f"Could not reach the LLM. Please ensure {self.getLlmModel()} is installed and that the required API key is configured. A VPN may also be required."
+            ) from exc
+
         return data["message"]["content"]

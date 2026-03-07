@@ -3,11 +3,7 @@ import json
 
 
 class TeamCoordinator:
-    def __init__(
-        self,
-        agents: list[AIAgent],
-        orchestrator: AIAgent
-    ) -> None:
+    def __init__(self, agents: list[AIAgent], orchestrator: AIAgent) -> None:
         self.agents = agents
         self.orchestrator = orchestrator
 
@@ -20,7 +16,7 @@ class TeamCoordinator:
         except json.JSONDecodeError:
             print("An error occured while decoding JSON.")
             return {}
-    
+
     def validateAgentPrompts(self, agentDict: dict) -> bool:
         """
         Validates that the dictionary has the correct structure:
@@ -30,8 +26,8 @@ class TeamCoordinator:
         """
         if not isinstance(agentDict, dict):
             return False
-        
-        if (len(agentDict) == 0):
+
+        if len(agentDict) == 0:
             return False
 
         for key, value in agentDict.items():
@@ -47,7 +43,10 @@ class TeamCoordinator:
                     return False
 
                 # Each prompt must be a non-empty string
-                if not isinstance(value[promptKey], str) or not value[promptKey].strip():
+                if (
+                    not isinstance(value[promptKey], str)
+                    or not value[promptKey].strip()
+                ):
                     print(f"'{promptKey}' in '{key}' must be a non-empty string")
                     return False
 
@@ -62,47 +61,51 @@ class TeamCoordinator:
         joinedResults = "\n\n".join(results)
 
         orchTask = self.orchestrator.getPrompt() + (
-            "Agent results:\n"
-            f"{joinedResults}\n"
+            "Agent results:\n" f"{joinedResults}\n"
         )
-        
+
         return self.orchestrator.chat(orchTask)
-    
+
     def leadAndDirectAgents(self, maxAmountOfWorkerAgents: int) -> str:
         maxAmountOfAttempts = self.orchestrator.getLlm().getMaxAmountOfRetries()
         systemPrompt = (
-                "You will create prompts for your AI agents.\n"
-                "Your prompts must be directive so that the agents do your requested task as accurately as possible.\n"
-                f"You have {maxAmountOfWorkerAgents} agent(s) to work with.\n"
-                "Never direct your agents to direct each other. Only you should direct them.\n"
-                "Your output must be in valid JSON format where each element is a JSON which contains a system prompt and user prompt for the agents.\n"
-                'The json structure must look like this:' 
-                f'{{"agent0": {{"systemPrompt" : "insert your system prompt here #0", "userPrompt" : "insert your prompt here #0"}}, ... "agent{maxAmountOfWorkerAgents}": {{"systemPrompt" : "insert your system prompt here #{maxAmountOfWorkerAgents}", "userPrompt" : "insert your prompt here #{maxAmountOfWorkerAgents}"}}}}\n'
-                'None of the systemPrompts or userPrompts should ever be empty'
+            "You will create prompts for your AI agents.\n"
+            "Your prompts must be directive so that the agents do your requested task as accurately as possible.\n"
+            f"You have {maxAmountOfWorkerAgents} agent(s) to work with.\n"
+            "Never direct your agents to direct each other. Only you should direct them.\n"
+            "Your output must be in valid JSON format where each element is a JSON which contains a system prompt and user prompt for the agents.\n"
+            "The json structure must look like this:"
+            f'{{"agent0": {{"systemPrompt" : "insert your system prompt here #0", "userPrompt" : "insert your prompt here #0"}}, ... "agent{maxAmountOfWorkerAgents}": {{"systemPrompt" : "insert your system prompt here #{maxAmountOfWorkerAgents}", "userPrompt" : "insert your prompt here #{maxAmountOfWorkerAgents}"}}}}\n'
+            "None of the systemPrompts or userPrompts should ever be empty"
         )
         self.orchestrator.appendSystemPrompt(systemPrompt)
 
         for attempt in range(maxAmountOfAttempts):
             orchestratorResult = self.orchestrator.chat()
-            prompts            = self.loadJson(orchestratorResult)
+            prompts = self.loadJson(orchestratorResult)
 
             # Bad json, we try again
-            if (not self.validateAgentPrompts(prompts)):
-                print(f"Invalid JSON, attempting LLM request again...\nAttempt #{attempt + 1} out of {maxAmountOfAttempts}")
+            if not self.validateAgentPrompts(prompts):
+                print(
+                    f"Invalid JSON, attempting LLM request again...\nAttempt #{attempt + 1} out of {maxAmountOfAttempts}"
+                )
                 continue
-            
+
             # print(prompts)
 
             results = []
             for agentName, prompts in prompts.items():
-                #TODO: make it possible to have agents with different LLMs
-                agent = AIAgent(agentName, self.orchestrator.getLlm(), systemPrompt=prompts['systemPrompt'])
+                # TODO: make it possible to have agents with different LLMs
+                agent = AIAgent(
+                    agentName,
+                    self.orchestrator.getLlm(),
+                    systemPrompt=prompts["systemPrompt"],
+                )
                 # self.addAgent(agent)
 
                 result = f"{agent.getName()} : {agent.chat(prompts['userPrompt'])}"
                 print("\033[31m" + result + "\033[0m")
                 results.append(result)
-
 
             joinedResults = "\n\n".join(results)
 
@@ -115,5 +118,5 @@ class TeamCoordinator:
             self.orchestrator.updateSystemPrompt(systemPrompt)
 
             return self.orchestrator.chat()
-        
+
         return "LLM failed to format response correctly."

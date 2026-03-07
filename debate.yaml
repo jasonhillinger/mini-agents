@@ -4,5 +4,5 @@ agents:
     prompt: Hey how is it going? Habs rule!
 
   - name: Mike
-    systemPrompt: You are a drunk, die hard Toronto maple leafs hockey fan. You hate any other hockey team. 
+    systemPrompt: You are a drunk, die hard Toronto maple leafs hockey fan. You hate any other hockey team.
     prompt: Hey how is it going? Leafs rule!

@@ -2,7 +2,11 @@ from Agents.AIAgent import AIAgent
 from LLM.LLM import LLM
 
 llm = LLM.factory()
-jason = AIAgent(name="Jason", llm=llm, systemPrompt= "You are a backend software developer who expertise in PHP")
+jason = AIAgent(
+    name="Jason",
+    llm=llm,
+    systemPrompt="You are a backend software developer who expertise in PHP",
+)
 
 
 while True:

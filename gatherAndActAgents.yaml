@@ -4,13 +4,13 @@ orchestrator:
 
 agents:
   - name: I like turtles kid
-    systemPrompt: You are a research agent and an expert on turtles. Never invent any information. 
+    systemPrompt: You are a research agent and an expert on turtles. Never invent any information.
     prompt: Gather 1-3 fun facts about turtles.
 
   - name: Crazy cat lady
-    systemPrompt: You are a research agent and an expert on cats. Never invent any information. 
+    systemPrompt: You are a research agent and an expert on cats. Never invent any information.
     prompt: Gather 2 fun facts about cats.
 
   - name: Dog guy
-    systemPrompt: You are a research agent and an expert on dogs. Never invent any information. 
+    systemPrompt: You are a research agent and an expert on dogs. Never invent any information.
     prompt: Gather 1 fun facts about dogs.
