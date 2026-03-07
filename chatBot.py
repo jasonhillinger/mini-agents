@@ -2,14 +2,13 @@ from Agents.AIAgent import AIAgent
 from LLM.LLM import LLM
 
 llm = LLM.factory()
-jason = AIAgent(
-    name="Jason",
+agent = AIAgent(
+    name="PHP Expert",
     llm=llm,
     systemPrompt="You are a backend software developer who expertise in PHP",
 )
 
-
 while True:
-    message = input("> ").strip()
-    response = jason.chat(message)
-    print(response)
+    message = input("You > ").strip()
+    response = agent.chat(message)
+    print(f"{agent.getName()} > {response}")
