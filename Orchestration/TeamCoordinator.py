@@ -1,4 +1,4 @@
-from AIAgent import AIAgent
+from Agents.AIAgent import AIAgent
 import json
 
 

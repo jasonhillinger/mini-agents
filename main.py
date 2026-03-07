@@ -1,5 +1,5 @@
-from TeamCoordinator import TeamCoordinator
-from AIAgent import AIAgent
+from Orchestration.TeamCoordinator import TeamCoordinator
+from Agents.AIAgent import AIAgent
 from LLM.LLM import LLM
 import yaml
 import random
