@@ -5,8 +5,8 @@ from .LLMInterface import LLMInterface
 
 class GPT_OSS_20B(LLMInterface):
 
-    def __init__(self, api_key: str, api_base_url: str, llm_model: str, max_retries: int = 3):
-        super().__init__(api_key, api_base_url, llm_model, max_retries)
+    def __init__(self, apiKey: str, apiBaseUrl: str, llmModel: str, maxRetries: int = 3):
+        super().__init__(apiKey, apiBaseUrl, llmModel, maxRetries)
 
     def chatCompletion(self, messages: list[dict[str, str]]) -> str:
         return self._executePostRequest("/v1/chat/completions", messages)

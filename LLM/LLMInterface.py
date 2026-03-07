@@ -3,11 +3,11 @@ from abc import ABC, abstractmethod
 class LLMInterface(ABC):
 
     @abstractmethod
-    def __init__(self, api_key: str, api_base_url: str, llm_model: str, max_retries: int) -> None:
-        self.API_KEY = api_key
-        self.API_BASE_URL = api_base_url
-        self.LLM_MODEL = llm_model
-        self.MAX_RETRIES = max_retries
+    def __init__(self, apiKey: str, apiBaseUrl: str, llmModel: str, maxRetries: int) -> None:
+        self.API_KEY = apiKey
+        self.API_BASE_URL = apiBaseUrl
+        self.LLM_MODEL = llmModel
+        self.MAX_RETRIES = maxRetries
 
     @abstractmethod 
     def chatCompletion(self, messages: list[dict[str, str]]) -> str:

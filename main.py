@@ -136,9 +136,9 @@ def main() -> None:
     for key, func in choices.items():
         print(f"{key}. {func.__name__}")
 
-    user_choice = input("Your choice: ")
+    userChoice = input("Your choice: ")
 
-    choices.get(user_choice, lambda: print("Invalid choice"))()
+    choices.get(userChoice, lambda: print("Invalid choice"))()
 
 if __name__ == "__main__":
     main()

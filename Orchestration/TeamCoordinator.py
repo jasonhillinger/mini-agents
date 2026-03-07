@@ -41,14 +41,14 @@ class TeamCoordinator:
                 return False
 
             # Both required keys must exist
-            for prompt_key in ["systemPrompt", "userPrompt"]:
-                if prompt_key not in value:
-                    print(f"Missing '{prompt_key}' in '{key}'")
+            for promptKey in ["systemPrompt", "userPrompt"]:
+                if promptKey not in value:
+                    print(f"Missing '{promptKey}' in '{key}'")
                     return False
 
                 # Each prompt must be a non-empty string
-                if not isinstance(value[prompt_key], str) or not value[prompt_key].strip():
-                    print(f"'{prompt_key}' in '{key}' must be a non-empty string")
+                if not isinstance(value[promptKey], str) or not value[promptKey].strip():
+                    print(f"'{promptKey}' in '{key}' must be a non-empty string")
                     return False
 
         return True
@@ -59,11 +59,11 @@ class TeamCoordinator:
             result = agent.chat()
 
             results.append(result)
-        joined_results = "\n\n".join(results)
+        joinedResults = "\n\n".join(results)
 
         orchTask = self.orchestrator.getPrompt() + (
             "Agent results:\n"
-            f"{joined_results}\n"
+            f"{joinedResults}\n"
         )
         
         return self.orchestrator.chat(orchTask)

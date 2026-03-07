@@ -5,9 +5,9 @@ import json
 
 class LLAMA_8B(LLMInterface):
 
-    def __init__(self, api_key: str, api_base_url: str, llm_model: str, max_retries: int = 3):
-        super().__init__(api_key=api_key, api_base_url=api_base_url, llm_model=llm_model, max_retries=max_retries)
-    
+    def __init__(self, apiKey: str, apiBaseUrl: str, llmModel: str, maxRetries: int = 3):
+        super().__init__(apiKey=apiKey, apiBaseUrl=apiBaseUrl, llmModel=llmModel, maxRetries=maxRetries)
+
     def chatCompletion(self, messages: list[dict[str, str]]) -> str:
         return self._executePostRequest("/api/chat", messages)
     

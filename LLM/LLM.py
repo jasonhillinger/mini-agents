@@ -4,10 +4,6 @@ from dotenv import load_dotenv
 from .LLMInterface import LLMInterface
 
 class LLM:
-
-    NO_LLM_MODEL_CHOSEN = "NO_LLM_MODEL_CHOSEN"
-    REQUIRED_API_KEY_ENV_VAR = "API_KEY"
-
     config = {}
 
     @staticmethod 
@@ -26,43 +22,43 @@ class LLM:
         
     
     @staticmethod
-    def factory(llm_model: str | None = None) -> LLMInterface:
+    def factory(llmModel: str | None = None) -> LLMInterface:
         LLM.loadConfig()
 
         # For simplicity, we assume only one LLM model will be configured at a time. 
         # We can extend this in the future to support multiple models if needed. 
-        if llm_model is None:
-            selected_model, model_config = next(iter(LLM.config.items()))
+        if llmModel is None:
+            selectedModel, modelConfig = next(iter(LLM.config.items()))
         else:
-            selected_model = llm_model
-            if selected_model not in LLM.config:
-                raise ValueError(f"LLM model '{selected_model}' not found in configuration.")
-            model_config = LLM.config[selected_model]
+            selectedModel = llmModel
+            if selectedModel not in LLM.config:
+                raise ValueError(f"LLM model '{selectedModel}' not found in configuration.")
+            modelConfig = LLM.config[selectedModel]
 
-        if not selected_model:
+        if not selectedModel:
             raise ValueError(
                 "No LLM model selected. Set LLM_MODEL in .env or pass a model name to LLM.factory(...)."
             )
         
-        api_base_url = model_config.get('API_BASE_URL', "").strip()
-        if not api_base_url:
-            raise ValueError(f"API_BASE_URL must be set for {selected_model} in .env file.")
+        apiBaseUrl = modelConfig.get('API_BASE_URL', "").strip()
+        if not apiBaseUrl:
+            raise ValueError(f"API_BASE_URL must be set for {selectedModel} in .env file.")
         
-        llm_model = model_config.get('LLM_MODEL', "").strip()
-        if not llm_model:
-            raise ValueError(f"LLM_MODEL must be set for {selected_model} in .env file.")
+        llmModel = modelConfig.get('LLM_MODEL', "").strip()
+        if not llmModel:
+            raise ValueError(f"LLM_MODEL must be set for {selectedModel} in .env file.")
 
         # Not all models may require an API key, so we won't enforce it as strictly, but we'll still read it if it's there
-        api_key = (model_config.get('API_KEY') or "").strip()
+        apiKey = (modelConfig.get('API_KEY') or "").strip()
 
         try:
-            module = importlib.import_module(f"LLM.{selected_model}")
-            llm_class = getattr(module, selected_model)
+            module = importlib.import_module(f"LLM.{selectedModel}")
+            llm_class = getattr(module, selectedModel)
         except (ModuleNotFoundError, AttributeError) as exc:
-            raise ValueError(f"Unsupported LLM type: {selected_model}") from exc
+            raise ValueError(f"Unsupported LLM type: {selectedModel}") from exc
 
-        llm_instance = llm_class(api_key=api_key, api_base_url=api_base_url, llm_model=llm_model, max_retries=int(model_config.get('MAX_RETRIES', 3)))
+        llm_instance = llm_class(apiKey=apiKey, apiBaseUrl=apiBaseUrl, llmModel=llmModel, maxRetries=int(modelConfig.get('MAX_RETRIES', 3)))
         if not isinstance(llm_instance, LLMInterface):
-            raise TypeError(f"{selected_model} must implement LLMInterface.")
+            raise TypeError(f"{selectedModel} must implement LLMInterface.")
 
         return llm_instance
