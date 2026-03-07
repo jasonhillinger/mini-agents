@@ -1,15 +1,12 @@
-import os
-from dotenv import load_dotenv
 import json
 import urllib.error
 import urllib.request
 from LLMInterface import LLMInterface
 
 class GPT_OSS_20B_llm(LLMInterface):
-    REQUIRED_API_KEY_ENV_VAR = "API_KEY"
 
-    def __init__(self, api_key: str, api_base_url: str, max_retries: int = 3):
-        super().__init__(api_key, api_base_url, max_retries)
+    def __init__(self, api_key: str, api_base_url: str, llm_model: str, max_retries: int = 3):
+        super().__init__(api_key, api_base_url, llm_model, max_retries)
 
     def chatCompletion(self, messages: list[dict[str, str]]) -> str:
         return self._executePostRequest("/v1/chat/completions", messages)

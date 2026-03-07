@@ -62,7 +62,7 @@ class LLM:
         except (ModuleNotFoundError, AttributeError) as exc:
             raise ValueError(f"Unsupported LLM type: {selected_model}") from exc
 
-        llm_instance = llm_class(api_key=api_key, api_base_url=api_base_url, max_retries=int(model_config.get('MAX_RETRIES', 3)))
+        llm_instance = llm_class(api_key=api_key, api_base_url=api_base_url, llm_model=llm_model, max_retries=int(model_config.get('MAX_RETRIES', 3)))
         if not isinstance(llm_instance, LLMInterface):
             raise TypeError(f"{selected_model} must implement LLMInterface.")
 
