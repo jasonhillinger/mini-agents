@@ -5,14 +5,20 @@ import yaml
 import random
 from termcolor import colored
 from typing import Literal, TypeAlias
+from pathlib import Path
 
 Color: TypeAlias = Literal[
     "black", "grey", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
 ]
 
-# This script takes pre-defined instructions to many agents, and then the orchestrator does stuff with the outputs of the agents
-# Good for consistent output where the output needs some structure.
-# The agents gether, the orchestrator acts
+
+def getConfigFromYaml(yamlFilename: str) -> dict:
+    BASE_DIR = Path(__file__).resolve().parent
+    path = BASE_DIR / yamlFilename
+    with open(path) as file:
+        config = yaml.safe_load(file)
+
+    return config
 
 
 def initializeTeam(config) -> TeamCoordinator:
@@ -40,9 +46,10 @@ def initializeTeam(config) -> TeamCoordinator:
     return TeamCoordinator(agents, orchestrator)
 
 
+# Example of gather and then act; Many agents gather information,
+# then the ochestrator agent takes that information and provides a final answer or solution to the problem at hand.
 def gatherAndThenAct() -> None:
-    with open("gatherAndActAgents.yaml") as file:
-        config = yaml.safe_load(file)
+    config = getConfigFromYaml("gatherAndActAgents.yaml")
 
     team: TeamCoordinator = initializeTeam(config)
     finalResult = team.gatherAndThenAct()
@@ -50,9 +57,10 @@ def gatherAndThenAct() -> None:
     print(finalResult)
 
 
+# Example of lead and direct; The orchestrator agent leads the team by giving each agent specific tasks to do,
+# then gathers the results and provides a final answer or solution to the problem at hand.
 def leadAndDirect() -> None:
-    with open("leadAndDirectAgents.yaml") as file:
-        config = yaml.safe_load(file)
+    config = getConfigFromYaml("leadAndDirectAgents.yaml")
 
     llm = LLM.factory()
 
@@ -71,10 +79,10 @@ def leadAndDirect() -> None:
     print(finalResult)
 
 
+# Example of debate; Two agents debate a topic for a specified amount of rounds.
 def debate() -> None:
     amountOfRounds = int(input("How many rounds should this debate go for? "))
-    with open("debate.yaml") as file:
-        config = yaml.safe_load(file)
+    config = getConfigFromYaml("debate.yaml")
 
     llm = LLM.factory()
 
