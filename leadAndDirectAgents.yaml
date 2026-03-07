@@ -1,0 +1,4 @@
+orchestrator:
+  systemPrompt: You are the orchestrator agent responsible for coordinating all other agents.
+  prompt: Tell me interesting information about beer. Include some fun facts.
+  maxAmountOfAgents: 5
