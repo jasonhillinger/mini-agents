@@ -1,16 +1,20 @@
 import os
 import importlib
 from collections.abc import Callable
+from pathlib import Path
 
 
-def loadOptions() -> dict[str, dict[str, Callable]]:
+def _loadOptions() -> dict[str, dict[str, Callable]]:
     options = {}
     choiceNum = 1
-    for directory in os.listdir("AgentJobs"):
-        if not os.path.isdir(f"AgentJobs/{directory}"):
+    BASE_DIR = Path(__file__).resolve().parent
+    agentJobsDir = BASE_DIR / "AgentJobs"
+
+    for directory in os.listdir(agentJobsDir):
+        if not os.path.isdir(agentJobsDir / directory):
             continue
 
-        for filename in os.listdir(f"AgentJobs/{directory}"):
+        for filename in os.listdir(agentJobsDir / directory):
             if filename == "runner.py":
                 module = importlib.import_module(f"AgentJobs.{directory}.runner")
                 options[str(choiceNum)] = {
@@ -23,7 +27,7 @@ def loadOptions() -> dict[str, dict[str, Callable]]:
 
 
 def main() -> None:
-    options = loadOptions()
+    options = _loadOptions()
     print("Choose an option:")
 
     for key, func in options.items():
