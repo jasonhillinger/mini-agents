@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from Agents.AIAgent import AIAgent
+from Agents.AgentTooler import AgentTooler
 import json
 
 
@@ -17,7 +20,7 @@ class TeamCoordinator:
             print("An error occured while decoding JSON.")
             return {}
 
-    def validateAgentPrompts(self, agentDict: dict) -> bool:
+    def validateAgentPrompts(self, agentDict: dict, requiredKeys: list) -> bool:
         """
         Validates that the dictionary has the correct structure:
         - Each value is a dict
@@ -37,7 +40,7 @@ class TeamCoordinator:
                 return False
 
             # Both required keys must exist
-            for promptKey in ["systemPrompt", "userPrompt"]:
+            for promptKey in requiredKeys:
                 if promptKey not in value:
                     print(f"Missing '{promptKey}' in '{key}'")
                     return False
@@ -85,7 +88,7 @@ class TeamCoordinator:
             prompts = self.loadJson(orchestratorResult)
 
             # Bad json, we try again
-            if not self.validateAgentPrompts(prompts):
+            if not self.validateAgentPrompts(prompts, ["systemPrompt", "userPrompt"]):
                 print(
                     f"Invalid JSON, attempting LLM request again...\nAttempt #{attempt + 1} out of {maxAmountOfAttempts}"
                 )
@@ -120,3 +123,69 @@ class TeamCoordinator:
             return self.orchestrator.chat()
 
         return "LLM failed to format response correctly."
+
+    def readerJobs(self) -> None:
+        readerAgents = {}
+        while True:
+            userQuestion = input("> ").strip()
+            if userQuestion.lower() in ["exit", "quit"]:
+                print("Exiting...")
+                break
+
+            for attempt in range(self.orchestrator.getLlm().getMaxAmountOfRetries()):
+                orchestratorResult = self.orchestrator.chat(userQuestion)
+                results = self.loadJson(orchestratorResult)
+
+                # Bad json, we try again
+                if not self.validateAgentPrompts(results, ["filePath", "question"]):
+                    print(
+                        f"Invalid JSON, attempting LLM request again...\nAttempt #{attempt + 1} out of {self.orchestrator.getLlm().getMaxAmountOfRetries()}"
+                    )
+                    continue
+
+                for value in results.values():
+                    filePath = value["filePath"]
+                    question = value["question"]
+
+                    lastModified = Path(filePath).stat().st_mtime
+
+                    if filePath not in readerAgents:
+                        readerAgent = AgentTooler(
+                            name=f"ReaderAgent_{filePath}",
+                            llm=self.orchestrator.getLlm(),
+                            tools={"readFile": True},
+                            systemPrompt="You are an expert of the file you are reading. Answer questions about the file based on its content.",
+                        )
+
+                        readerAgent.readFile(filePath)
+
+                        readerAgents[filePath] = {
+                            "agent": readerAgent,
+                            "lastModified": lastModified,
+                            "question": question,
+                            "response": None,
+                        }
+                    elif lastModified > readerAgents[filePath]["lastModified"]:
+                        readerAgents[filePath]["agent"].readFile(filePath)
+                        readerAgents[filePath]["lastModified"] = lastModified
+
+                    readerAgents[filePath]["response"] = readerAgents[filePath][
+                        "agent"
+                    ].chat(question)
+                    readerAgents[filePath]["question"] = question
+
+                self.orchestrator.updateSystemPrompt(
+                    "You created questions for your reader agents based on the files they read."
+                )
+
+                print(
+                    self.orchestrator.chat(
+                        "Here are the questions and their corresponding file paths:\n"
+                        + "\n".join(
+                            [
+                                f"{filePath} got question: {value['question']} with response: {value['response']}"
+                                for filePath, value in readerAgents.items()
+                            ]
+                        )
+                    )
+                )
