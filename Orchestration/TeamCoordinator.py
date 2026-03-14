@@ -160,8 +160,9 @@ class TeamCoordinator:
 
             systemPromptFiles = [result[1] for result in ragResults]
 
-            # TODO: continue using this to add more context to the orchestrator about the files that are relevant to the question
-            systemPromptFiles = systemPromptFiles
+            self.orchestrator.setExtraSystemPrompt(
+                f"The following files might be relevant to the user's question: {', '.join(systemPromptFiles)}"
+            )
             for attempt in range(self.orchestrator.getLlm().getMaxAmountOfRetries()):
                 orchestratorResult = self.orchestrator.chat(userQuestion)
                 results = self.loadJson(orchestratorResult)

@@ -13,6 +13,7 @@ class AIAgent:
         self.llm = llm
         self.prompt = prompt
         self.systemPrompt = systemPrompt
+        self.extraSystemPrompt = ""
         self.messages = []
 
     def getPrompt(self) -> str:
@@ -28,7 +29,7 @@ class AIAgent:
         self.messages = [self.messages[0]]
 
     def getSystemPromptStructured(self) -> dict:
-        return {"role": "system", "content": self.systemPrompt}
+        return {"role": "system", "content": self.systemPrompt + self.extraSystemPrompt}
 
     def getSystemPrompt(self) -> str:
         return self.systemPrompt
@@ -38,6 +39,9 @@ class AIAgent:
 
     def updateSystemPrompt(self, prompt: str) -> None:
         self.systemPrompt = prompt
+
+    def setExtraSystemPrompt(self, prompt: str) -> None:
+        self.extraSystemPrompt = prompt
 
     def getMessagesForChat(self) -> list:
         return [self.getSystemPromptStructured(), *self.messages]
