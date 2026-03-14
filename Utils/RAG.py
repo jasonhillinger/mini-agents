@@ -5,12 +5,6 @@ from collections import Counter, defaultdict
 
 class RAG:
     def __init__(self, documents: dict[str, str]):
-        """
-        documents = {
-            "file path or description": "value returned when matched"
-        }
-        """
-
         self.documents = documents
         self.keys = list(documents.keys())
 
@@ -44,17 +38,21 @@ class RAG:
     def computeTfidf(self, tokens):
         tf = Counter(tokens)
         vec = {}
-
-        for word in self.vocab:
-            vec[word] = tf[word] * self.idf.get(word, 0)
+        for word in tf:
+            if word in self.idf:
+                vec[word] = tf[word] * self.idf[word]
 
         return vec
 
     def cosineSimilarity(self, v1, v2):
-        dot = sum(v1[w] * v2[w] for w in self.vocab)
+        dot = 0
 
-        mag1 = math.sqrt(sum(v1[w] ** 2 for w in self.vocab))
-        mag2 = math.sqrt(sum(v2[w] ** 2 for w in self.vocab))
+        for word in v1:
+            if word in v2:
+                dot += v1[word] * v2[word]
+
+        mag1 = math.sqrt(sum(v * v for v in v1.values()))
+        mag2 = math.sqrt(sum(v * v for v in v2.values()))
 
         if mag1 == 0 or mag2 == 0:
             return 0
@@ -63,7 +61,13 @@ class RAG:
 
     def search(self, query: str, maxResults: int = 3):
         queryTokens = self.tokenize(query)
-        queryVec = self.computeTfidf(queryTokens)
+
+        queryVec = {}
+        tf = Counter(queryTokens)
+
+        for word in tf:
+            if word in self.idf:
+                queryVec[word] = tf[word] * self.idf[word]
 
         scores = []
 
@@ -73,11 +77,11 @@ class RAG:
             scores.append(
                 (
                     score,
-                    self.keys[i],  # matched key
-                    self.documents[self.keys[i]],  # return value
+                    self.keys[i],
+                    self.documents[self.keys[i]],
                 )
             )
 
-        scores.sort(reverse=True)
+        scores.sort(key=lambda x: x[0], reverse=True)
 
         return scores[:maxResults]

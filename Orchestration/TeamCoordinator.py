@@ -133,7 +133,7 @@ class TeamCoordinator:
         for file in files:
             with open(file, encoding="utf-8", errors="ignore") as f:
                 content = f.read()
-                documents[file] = content
+                documents[content] = file
 
         return RAG(documents)
 
@@ -153,12 +153,14 @@ class TeamCoordinator:
                 print("Exiting...")
                 break
 
+            print("Searching for relevant documents...")
             ragResults = rag.search(userQuestion, maxResults=5)
+            print(f"Found {len(ragResults)} relevant documents.")
             if len(ragResults) == 0:
                 print("No relevant documents found.")
                 return
 
-            systemPromptFiles = [result[1] for result in ragResults]
+            systemPromptFiles = [result[2] for result in ragResults]
 
             self.orchestrator.setExtraSystemPrompt(
                 f"The following files might be relevant to the user's question: {', '.join(systemPromptFiles)}"
