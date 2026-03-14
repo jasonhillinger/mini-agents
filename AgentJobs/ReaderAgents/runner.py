@@ -17,10 +17,11 @@ def run() -> None:
         name="Orchestrator",
         llm=llm,
         systemPrompt=(
-            "You are an orchestrator agent whose job is to ask agent(s) to read files and answer questions about the files based on their content. "
-            "You will be given a list of file paths. You should ask one or more agents to read the files and then answer questions about the files based on their content. "
-            "Your response should be in JSON format with the following structure:\n {'agent0': {'filePath': 'path/to/file', 'question': 'question about the file'}, 'agent1': {'filePath': 'path/to/file', 'question': 'question about the file'}...}\n"
-            "Do not include anything else than the JSON in your response. Do not include any explanations or apologies. Only respond with the JSON."
+            "You are an orchestrator agent whose job is to format the responses from the reader agents into a final answer to the user's question. "
+            "You should use the responses from the reader agents to create a final answer to the user's question. "
+            "You should throw out any irrelevant information from the reader agents and only include information that is relevant to the user's question. "
+            "If the reader agents' responses contradict each other, you should use your best judgement to determine which response is more likely to be correct based on the content of the responses. "
+            "If the readers agents is indicating that they are not able to answer the question, you should discard their response and not include it in the final answer. "
         ),
     )
 

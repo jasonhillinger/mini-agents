@@ -153,73 +153,48 @@ class TeamCoordinator:
                 print("Exiting...")
                 break
 
-            ragResults = rag.search(userQuestion, maxResults=5)
+            ragResults = rag.search(userQuestion, maxResults=3)
 
             if len(ragResults) == 0:
                 print("No relevant documents found.")
                 return
 
-            systemPromptFiles = [result[2] for result in ragResults]
+            files = [result[2] for result in ragResults]
 
-            self.orchestrator.setExtraSystemPrompt(
-                f"The following files might be relevant to the user's question: {', '.join(systemPromptFiles)}"
+            for filePath in files:
+                lastModified = Path(filePath).stat().st_mtime
+
+                if filePath not in readerAgents:
+                    readerAgent = AgentTooler(
+                        name=f"ReaderAgent_{filePath}",
+                        llm=self.orchestrator.getLlm(),
+                        tools={"readFile": True},
+                        systemPrompt="You are an expert of the file you are reading. Answer questions about the file based on its content.",
+                    )
+
+                    readerAgent.readFile(filePath)
+
+                    readerAgents[filePath] = {
+                        "agent": readerAgent,
+                        "lastModified": lastModified,
+                        "question": userQuestion,
+                        "response": None,
+                    }
+                elif lastModified > readerAgents[filePath]["lastModified"]:
+                    readerAgents[filePath]["agent"].readFile(filePath)
+                    readerAgents[filePath]["lastModified"] = lastModified
+
+                readerAgents[filePath]["response"] = readerAgents[filePath][
+                    "agent"
+                ].chat(userQuestion)
+                readerAgents[filePath]["question"] = userQuestion
+
+            responses = ""
+            for i in readerAgents:
+                responses += f"{readerAgents[i]['agent'].getName()} :\n{readerAgents[i]['response']}\n\n"
+
+            finalResponse = self.orchestrator.chat(
+                "Here are results from your agents:\n" f"{responses}\n"
             )
-            for attempt in range(self.orchestrator.getLlm().getMaxAmountOfRetries()):
-                orchestratorResult = self.orchestrator.chat(userQuestion)
-                results = self.loadJson(orchestratorResult)
 
-                # Bad json, we try again
-                if not self.validateAgentPrompts(results, ["filePath", "question"]):
-                    print(
-                        f"Invalid JSON, attempting LLM request again...\nAttempt #{attempt + 1} out of {self.orchestrator.getLlm().getMaxAmountOfRetries()}"
-                    )
-                    self.orchestrator.revertPreviousConversation()
-                    continue
-
-                for value in results.values():
-                    filePath = value["filePath"]
-                    question = value["question"]
-
-                    lastModified = Path(filePath).stat().st_mtime
-
-                    if filePath not in readerAgents:
-                        readerAgent = AgentTooler(
-                            name=f"ReaderAgent_{filePath}",
-                            llm=self.orchestrator.getLlm(),
-                            tools={"readFile": True},
-                            systemPrompt="You are an expert of the file you are reading. Answer questions about the file based on its content.",
-                        )
-
-                        readerAgent.readFile(filePath)
-
-                        readerAgents[filePath] = {
-                            "agent": readerAgent,
-                            "lastModified": lastModified,
-                            "question": question,
-                            "response": None,
-                        }
-                    elif lastModified > readerAgents[filePath]["lastModified"]:
-                        readerAgents[filePath]["agent"].readFile(filePath)
-                        readerAgents[filePath]["lastModified"] = lastModified
-
-                    readerAgents[filePath]["response"] = readerAgents[filePath][
-                        "agent"
-                    ].chat(question)
-                    readerAgents[filePath]["question"] = question
-
-                self.orchestrator.updateSystemPrompt(
-                    "You created questions for your reader agents based on the files they read."
-                )
-
-                print(
-                    self.orchestrator.chat(
-                        "Here are the questions and their corresponding file paths:\n"
-                        + "\n".join(
-                            [
-                                f"{filePath} got question: {value['question']} with response: {value['response']}"
-                                for filePath, value in readerAgents.items()
-                            ]
-                        )
-                    )
-                )
-                return
+            print(finalResponse)
