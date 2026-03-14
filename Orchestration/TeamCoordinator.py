@@ -20,7 +20,8 @@ class TeamCoordinator:
             print("An error occured while decoding JSON.")
             return {}
 
-    def validateAgentPrompts(self, agentDict: dict, requiredKeys: list) -> bool:
+    @staticmethod
+    def validateAgentPrompts(agentDict: dict, requiredKeys: list) -> bool:
         """
         Validates that the dictionary has the correct structure:
         - Each value is a dict
