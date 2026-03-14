@@ -22,6 +22,16 @@ class RAG:
         text = text.lower()
         return re.findall(r"\b[a-z0-9_]+\b", text)
 
+    def updateValue(self, key: str, newValue: str):
+        if key in self.documents:
+            self.documents[key] = newValue
+            index = self.keys.index(key)
+            self.valueTokens[index] = self.tokenize(newValue)
+            self.valueVectors[index] = self.computeTfidf(self.valueTokens[index])
+            return
+
+        raise KeyError(f"Key '{key}' not found in documents.")
+
     def computeIdf(self):
         N = len(self.valueTokens)
         df = defaultdict(int)
