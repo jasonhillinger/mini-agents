@@ -63,6 +63,36 @@ class RAG:
 
         return words + bigrams
 
+    def updateValue(self, key: str, newValue: str):
+        if key in self.documents:
+            self.documents[key] = newValue
+            index = self.keys.index(key)
+            self.tokenized[index] = self.tokenize(newValue)
+            return
+
+        raise KeyError(f"Key '{key}' not found in documents.")
+
+    def getValue(self, key: str) -> str:
+        if key in self.documents:
+            return self.documents[key]
+
+        raise KeyError(f"Key '{key}' not found in documents.")
+
+    def cosineSimilarity(self, v1, v2):
+        dot = 0
+
+        for word in v1:
+            if word in v2:
+                dot += v1[word] * v2[word]
+
+        mag1 = math.sqrt(sum(v * v for v in v1.values()))
+        mag2 = math.sqrt(sum(v * v for v in v2.values()))
+
+        if mag1 == 0 or mag2 == 0:
+            return 0
+
+        return dot / (mag1 * mag2)
+
     # ----------------------------
     # BM25
     # ----------------------------
