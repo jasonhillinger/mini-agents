@@ -12,8 +12,6 @@ def run() -> None:
 
     directory = Path(config["directory"])
 
-    files = [str(f) for f in directory.iterdir() if f.is_file()]
-
     # Create orchestrator object
     orchestrator = AIAgent(
         name="Orchestrator",
@@ -22,9 +20,8 @@ def run() -> None:
             "You are an orchestrator agent whose job is to ask agent(s) to read files and answer questions about the files based on their content. "
             "You will be given a list of file paths. You should ask one or more agents to read the files and then answer questions about the files based on their content. "
             "Your response should be in JSON format with the following structure:\n {{'filePath': 'path/to/file', 'question': 'question about the file'}, {'filePath': 'path/to/file', 'question': 'question about the file'}...}\n"
-            "The list of file paths are as follows:\n" + "\n".join(files)
         ),
     )
 
     team = TeamCoordinator([], orchestrator=orchestrator)
-    team.readerJobs()
+    team.readerJobs(directory)

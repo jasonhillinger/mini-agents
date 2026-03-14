@@ -4,6 +4,8 @@ from Agents.AIAgent import AIAgent
 from Agents.AgentTooler import AgentTooler
 import json
 
+from Utils.RAG import RAG
+
 
 class TeamCoordinator:
     def __init__(self, agents: list[AIAgent], orchestrator: AIAgent) -> None:
@@ -124,14 +126,41 @@ class TeamCoordinator:
 
         return "LLM failed to format response correctly."
 
-    def readerJobs(self) -> None:
+    @staticmethod
+    def _initializeRag(files: list[str]):
+        documents = {}
+        for file in files:
+            with open(file, encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+                documents[file] = content
+
+        return RAG(documents)
+
+    def readerJobs(self, directory: Path) -> None:
         readerAgents = {}
+
+        files = [
+            str(f)
+            for f in directory.rglob("*")
+            if f.is_file() and not any(part.startswith(".") for part in f.parts)
+        ]
+
+        rag = self._initializeRag(files)
         while True:
             userQuestion = input("> ").strip()
             if userQuestion.lower() in ["exit", "quit"]:
                 print("Exiting...")
                 break
 
+            ragResults = rag.search(userQuestion, maxResults=5)
+            if len(ragResults) == 0:
+                print("No relevant documents found.")
+                return
+
+            systemPromptFiles = [result[1] for result in ragResults]
+
+            # TODO: continue using this to add more context to the orchestrator about the files that are relevant to the question
+            systemPromptFiles = systemPromptFiles
             for attempt in range(self.orchestrator.getLlm().getMaxAmountOfRetries()):
                 orchestratorResult = self.orchestrator.chat(userQuestion)
                 results = self.loadJson(orchestratorResult)
