@@ -49,6 +49,10 @@ class AIAgent:
     def addMessage(self, role: str, content: str) -> None:
         self.messages.append({"role": role, "content": content})
 
+    def revertPreviousConversation(self) -> None:
+        if len(self.messages) >= 2:
+            self.messages = self.messages[:-2]
+
     def chat(self, userMessage: str | None = None) -> str:
         if userMessage is None:
             userMessage = self.getPrompt()

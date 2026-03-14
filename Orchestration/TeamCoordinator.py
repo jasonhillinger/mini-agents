@@ -173,6 +173,7 @@ class TeamCoordinator:
                     print(
                         f"Invalid JSON, attempting LLM request again...\nAttempt #{attempt + 1} out of {self.orchestrator.getLlm().getMaxAmountOfRetries()}"
                     )
+                    self.orchestrator.revertPreviousConversation()
                     continue
 
                 for value in results.values():
@@ -221,3 +222,4 @@ class TeamCoordinator:
                         )
                     )
                 )
+                return
