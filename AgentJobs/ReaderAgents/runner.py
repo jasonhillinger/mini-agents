@@ -19,7 +19,7 @@ def run() -> None:
         systemPrompt=(
             "You are an orchestrator agent whose job is to ask agent(s) to read files and answer questions about the files based on their content. "
             "You will be given a list of file paths. You should ask one or more agents to read the files and then answer questions about the files based on their content. "
-            "Your response should be in JSON format with the following structure:\n {{'filePath': 'path/to/file', 'question': 'question about the file'}, {'filePath': 'path/to/file', 'question': 'question about the file'}...}\n"
+            "Your response should be in JSON format with the following structure:\n {'agent0': {'filePath': 'path/to/file', 'question': 'question about the file'}, 'agent1': {'filePath': 'path/to/file', 'question': 'question about the file'}...}\n"
         ),
     )
 

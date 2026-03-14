@@ -153,9 +153,8 @@ class TeamCoordinator:
                 print("Exiting...")
                 break
 
-            print("Searching for relevant documents...")
             ragResults = rag.search(userQuestion, maxResults=5)
-            print(f"Found {len(ragResults)} relevant documents.")
+
             if len(ragResults) == 0:
                 print("No relevant documents found.")
                 return
