@@ -172,7 +172,8 @@ class TeamCoordinator:
                         systemPrompt="You are an expert of the file you are reading. Answer questions about the file based on its content.",
                     )
 
-                    readerAgent.readFile(filePath)
+                    content = rag.getValue(filePath)
+                    readerAgent.readFileContent(content)
 
                     readerAgents[filePath] = {
                         "agent": readerAgent,
@@ -181,7 +182,10 @@ class TeamCoordinator:
                         "response": None,
                     }
                 elif lastModified > readerAgents[filePath]["lastModified"]:
-                    readerAgents[filePath]["agent"].readFile(filePath)
+                    # Since the file was modified, we update the RAG and let the agent also read it again before answering
+                    content = open(filePath, encoding="utf-8", errors="ignore").read()
+                    rag.updateValue(filePath, content)
+                    readerAgents[filePath]["agent"].readFileContent(content)
                     readerAgents[filePath]["lastModified"] = lastModified
 
                 readerAgents[filePath]["response"] = readerAgents[filePath][
