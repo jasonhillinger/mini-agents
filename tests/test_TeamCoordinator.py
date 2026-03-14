@@ -1,0 +1,57 @@
+import unittest
+from Orchestration.TeamCoordinator import TeamCoordinator
+
+
+class TestTeamCoordinator(unittest.TestCase):
+    def test_validDictionaryResponse(self):
+        validDict = {
+            "agent0": {
+                "systemPrompt": "You are a helpful assistant.",
+                "userPrompt": "What is the capital of France?",
+            },
+            "agent1": {
+                "systemPrompt": "You are a math expert.",
+                "userPrompt": "What is 2 + 2?",
+            },
+        }
+        self.assertTrue(
+            TeamCoordinator.validateAgentPrompts(
+                validDict, ["systemPrompt", "userPrompt"]
+            )
+        )
+
+    def test_invalidDictionaryResponse(self):
+        cases = [
+            None,  # Not a dictionary
+            {},  # Empty dictionary
+            {"agent1": "Not a dict"},  # Value is not a dict
+            {
+                "agent1": {"systemPrompt": "You are a helpful assistant."}
+            },  # Missing userPrompt
+            {
+                "agent1": {"userPrompt": "What is the capital of France?"}
+            },  # Missing systemPrompt
+            {
+                "agent1": {
+                    "systemPrompt": "",
+                    "userPrompt": "What is the capital of France?",
+                }
+            },  # Empty systemPrompt
+            {
+                "agent1": {
+                    "systemPrompt": "You are a helpful assistant.",
+                    "userPrompt": "",
+                }
+            },  # Empty userPrompt
+        ]
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertFalse(
+                    TeamCoordinator.validateAgentPrompts(
+                        case, ["systemPrompt", "userPrompt"]
+                    )
+                )
+
+
+if __name__ == "__main__":
+    unittest.main()
