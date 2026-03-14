@@ -128,7 +128,7 @@ class TeamCoordinator:
         return "LLM failed to format response correctly."
 
     @staticmethod
-    def _initializeRag(files: list[str]):
+    def _initializeRag(files: list[str]) -> RAG:
         documents = {}
         for file in files:
             with open(file, encoding="utf-8", errors="ignore") as f:
