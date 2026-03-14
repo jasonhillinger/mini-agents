@@ -15,11 +15,17 @@ class AgentTooler(AIAgent):
         super().__init__(name=name, llm=llm, systemPrompt=systemPrompt, prompt=prompt)
         self.tools = tools
 
-    def readFile(self, filePath: str):
+    def readFile(self, filePath: str) -> None:
         if not self.tools.get("readFile", False):
-            return "Tool not available"
+            raise Exception("Tool not available")
 
         content = AgentTools.readFile(filePath)
-        self.appendSystemPrompt(
+        self.setExtraSystemPrompt(
             f"The content of the file {filePath} is:\n{content.getContent()}"
         )
+
+    def readFileContent(self, content: str):
+        if not self.tools.get("readFile", False):
+            raise Exception("Tool not available")
+
+        self.setExtraSystemPrompt(f"The content of the file is:\n{content}")

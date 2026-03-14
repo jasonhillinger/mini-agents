@@ -32,6 +32,12 @@ class RAG:
 
         raise KeyError(f"Key '{key}' not found in documents.")
 
+    def getValue(self, key: str) -> str:
+        if key in self.documents:
+            return self.documents[key]
+
+        raise KeyError(f"Key '{key}' not found in documents.")
+
     def computeIdf(self):
         N = len(self.valueTokens)
         df = defaultdict(int)
