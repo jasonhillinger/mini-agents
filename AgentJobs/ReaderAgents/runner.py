@@ -22,6 +22,7 @@ def run() -> None:
             "You should throw out any irrelevant information from the reader agents and only include information that is relevant to the user's question. "
             "If the reader agents' responses contradict each other, you should use your best judgement to determine which response is more likely to be correct based on the content of the responses. "
             "If the readers agents is indicating that they are not able to answer the question, you should discard their response and not include it in the final answer. "
+            "Your final answer should be a concise and accurate. Dont mention the reader agents in your final answer. Just provide the final answer to the user's question based on the information provided by the reader agents."
         ),
     )
 
