@@ -7,25 +7,26 @@ class RAG:
     def __init__(self, documents: dict[str, str]):
         self.documents = documents
         self.keys = list(documents.keys())
+        self.values = list(documents.values())
 
-        self.keyTokens = [self.tokenize(k) for k in self.keys]
+        self.valueTokens = [self.tokenize(k) for k in self.values]
 
         self.vocab = set()
-        for tokens in self.keyTokens:
+        for tokens in self.valueTokens:
             self.vocab.update(tokens)
 
         self.idf = self.computeIdf()
-        self.keyVectors = [self.computeTfidf(tokens) for tokens in self.keyTokens]
+        self.valueVectors = [self.computeTfidf(tokens) for tokens in self.valueTokens]
 
     def tokenize(self, text: str):
         text = text.lower()
         return re.findall(r"\b[a-z0-9_]+\b", text)
 
     def computeIdf(self):
-        N = len(self.keyTokens)
+        N = len(self.valueTokens)
         df = defaultdict(int)
 
-        for tokens in self.keyTokens:
+        for tokens in self.valueTokens:
             for word in set(tokens):
                 df[word] += 1
 
@@ -71,8 +72,8 @@ class RAG:
 
         scores = []
 
-        for i, keyVec in enumerate(self.keyVectors):
-            score = self.cosineSimilarity(queryVec, keyVec)
+        for i, valueVec in enumerate(self.valueVectors):
+            score = self.cosineSimilarity(queryVec, valueVec)
 
             scores.append(
                 (
