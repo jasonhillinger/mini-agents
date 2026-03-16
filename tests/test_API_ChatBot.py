@@ -38,6 +38,15 @@ class TestAPIChatBot(unittest.TestCase):
             responseData["detail"][0]["msg"], "Input should be a valid list"
         )
 
+    def test_emptyMessagesList(self):
+        payload = {"messages": []}
+
+        response = client.post("/run-agent-job/chat-bot", json=payload)
+
+        self.assertEqual(response.status_code, 400)
+        responseData = response.json()
+        self.assertEqual(responseData["detail"], "Missing 'messages' field")
+
 
 if __name__ == "__main__":
     unittest.main()
