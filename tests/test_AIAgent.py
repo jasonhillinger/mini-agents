@@ -1,18 +1,22 @@
 import unittest
 from Agents.AIAgent import AIAgent
-from LLM.LLM import LLM
+from LLM.MOCK_LLM import MOCK_LLM
 
 
 class TestAIAgent(unittest.TestCase):
+    @staticmethod
+    def getMockLLM() -> MOCK_LLM:
+        return MOCK_LLM("abc123", "http://localhost:11434", "MockLLM", 10)
+
     def test_agentInitiation(self):
-        llmMock = LLM.factory()  # You would replace this with a mock LLMInterface
+        llmMock = self.getMockLLM()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
         prompt = "What is the capital of France?"
 
         agent = AIAgent(
             name=agentName,
-            llm=llmMock,  # You would replace this with a mock LLMInterface
+            llm=llmMock,
             systemPrompt=systemPrompt,
             prompt=prompt,
         )
@@ -25,21 +29,19 @@ class TestAIAgent(unittest.TestCase):
         self.assertEqual(agent.getPrompt(), prompt)
 
     def test_agentMockChat(self):
-        llmMock = LLM.factory()  # You would replace this with a mock LLMInterface
+        llmMock = self.getMockLLM()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
         agent = AIAgent(
             name=agentName,
-            llm=llmMock,  # You would replace this with a mock LLMInterface
+            llm=llmMock,
             systemPrompt=systemPrompt,
         )
 
-        userMessage = "How big is the the Earth?"
-        agent.addMessage("user", userMessage)
+        userMessage = MOCK_LLM.CHAT_MESSAGES[0]
+        aiResponse = agent.chat(userMessage)
 
-        aiResponse = "The Earth is approximately 12,742 kilometers in diameter."
-        agent.addMessage("assistant", aiResponse)
         messagesForChat = agent.getMessagesForChat()
         self.assertEqual(
             messagesForChat,
@@ -51,13 +53,13 @@ class TestAIAgent(unittest.TestCase):
         )
 
     def test_agentGetMessagesForChat(self):
-        llmMock = LLM.factory()  # You would replace this with a mock LLMInterface
+        llmMock = self.getMockLLM()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
         agent = AIAgent(
             name=agentName,
-            llm=llmMock,  # You would replace this with a mock LLMInterface
+            llm=llmMock,
             systemPrompt=systemPrompt,
         )
 
@@ -89,21 +91,18 @@ class TestAIAgent(unittest.TestCase):
         )
 
     def test_agentReset(self):
-        llmMock = LLM.factory()  # You would replace this with a mock LLMInterface
+        llmMock = self.getMockLLM()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
         agent = AIAgent(
             name=agentName,
-            llm=llmMock,  # You would replace this with a mock LLMInterface
+            llm=llmMock,
             systemPrompt=systemPrompt,
         )
 
-        userMessage = "How big is the the Earth?"
-        agent.addMessage("user", userMessage)
-
-        aiResponse = "The Earth is approximately 12,742 kilometers in diameter."
-        agent.addMessage("assistant", aiResponse)
+        userMessage = MOCK_LLM.CHAT_MESSAGES[1]
+        agent.chat(userMessage)
 
         agent.reset()
         self.assertEqual(
@@ -111,27 +110,33 @@ class TestAIAgent(unittest.TestCase):
         )
 
     def test_agentRevertPreviousConversation(self):
-        llmMock = LLM.factory()  # You would replace this with a mock LLMInterface
+        llmMock = self.getMockLLM()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
         agent = AIAgent(
             name=agentName,
-            llm=llmMock,  # You would replace this with a mock LLMInterface
+            llm=llmMock,
             systemPrompt=systemPrompt,
         )
 
-        userMessage1 = "How big is the the Earth?"
-        agent.addMessage("user", userMessage1)
+        userMessage1 = MOCK_LLM.CHAT_MESSAGES[0]
+        aiResponse1 = agent.chat(userMessage1)
 
-        aiResponse1 = "The Earth is approximately 12,742 kilometers in diameter."
-        agent.addMessage("assistant", aiResponse1)
+        userMessage2 = MOCK_LLM.CHAT_MESSAGES[1]
+        aiResponse2 = agent.chat(userMessage2)
 
-        userMessage2 = "What about the Moon?"
-        agent.addMessage("user", userMessage2)
-
-        aiResponse2 = "The Moon is approximately 3,474 kilometers in diameter."
-        agent.addMessage("assistant", aiResponse2)
+        beforeRevertMessages = agent.getMessagesForChat()
+        self.assertEqual(
+            beforeRevertMessages,
+            [
+                {"role": "system", "content": systemPrompt},
+                {"role": "user", "content": userMessage1},
+                {"role": "assistant", "content": aiResponse1},
+                {"role": "user", "content": userMessage2},
+                {"role": "assistant", "content": aiResponse2},
+            ],
+        )
 
         agent.revertPreviousConversation()
 
@@ -146,13 +151,13 @@ class TestAIAgent(unittest.TestCase):
         )
 
     def test_agentRevertPreviousConversationWithNoMessages(self):
-        llmMock = LLM.factory()  # You would replace this with a mock LLMInterface
+        llmMock = self.getMockLLM()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
         agent = AIAgent(
             name=agentName,
-            llm=llmMock,  # You would replace this with a mock LLMInterface
+            llm=llmMock,
             systemPrompt=systemPrompt,
         )
 

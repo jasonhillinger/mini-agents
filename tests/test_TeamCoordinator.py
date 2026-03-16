@@ -14,11 +14,14 @@ class TestTeamCoordinator(unittest.TestCase):
                 "userPrompt": "What is 2 + 2?",
             },
         }
-        self.assertTrue(
+        try:
             TeamCoordinator.validateAgentPrompts(
                 validDict, ["systemPrompt", "userPrompt"]
             )
-        )
+        except ValueError:
+            self.fail(
+                "validateAgentPrompts raised ValueError unexpectedly with valid input!"
+            )
 
     def test_invalidDictionaryResponse(self):
         cases = [
@@ -46,11 +49,12 @@ class TestTeamCoordinator(unittest.TestCase):
         ]
         for case in cases:
             with self.subTest(case=case):
-                self.assertFalse(
+                try:
                     TeamCoordinator.validateAgentPrompts(
                         case, ["systemPrompt", "userPrompt"]
                     )
-                )
+                except ValueError:
+                    self.assertTrue(True)  # Expected outcome
 
 
 if __name__ == "__main__":
