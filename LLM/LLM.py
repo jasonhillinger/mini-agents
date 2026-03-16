@@ -2,6 +2,8 @@ import importlib
 import os
 from dotenv import load_dotenv
 from .LLMInterface import LLMInterface
+import config
+from LLM.MOCK_LLM import MOCK_LLM
 
 
 class LLM:
@@ -22,6 +24,14 @@ class LLM:
 
     @staticmethod
     def factory(llmModel: str | None = None) -> LLMInterface:
+        if config.TEST_MODE_ENABLED:
+            return MOCK_LLM(
+                apiKey="test_api_key",
+                apiBaseUrl="http://localhost:11434",
+                llmModel="MockLLM",
+                maxRetries=10,
+            )
+
         LLM.loadConfig()
 
         # For simplicity, we assume only one LLM model will be configured at a time.
