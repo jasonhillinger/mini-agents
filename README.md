@@ -115,6 +115,16 @@ agents:
 3. Add a `.yaml` config file for agent definitions
 4. The scenario will automatically appear in the interactive menu
 
+### API
+
+To debugg, launch the server like this:
+python3 -m debugpy --listen 5678 -m uvicorn api:app --reload
+
+To lauch server normally:
+uvicorn api:app --reload
+
+In the file where run() exists, create an api() (TODO finish this documentation)
+
 ## Testing
 
 The project includes comprehensive unit tests:
