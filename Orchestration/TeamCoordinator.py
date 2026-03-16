@@ -23,7 +23,7 @@ class TeamCoordinator:
             return {}
 
     @staticmethod
-    def validateAgentPrompts(agentDict: dict, requiredKeys: list) -> bool:
+    def validateAgentPrompts(agentDict: dict, requiredKeys: list) -> None:
         """
         Validates that the dictionary has the correct structure:
         - Each value is a dict
@@ -31,32 +31,29 @@ class TeamCoordinator:
         - Both prompts are non-empty strings
         """
         if not isinstance(agentDict, dict):
-            return False
+            raise ValueError("Input must be a dictionary")
 
         if len(agentDict) == 0:
-            return False
+            raise ValueError("Input dictionary is empty")
 
         for key, value in agentDict.items():
             # Each value must be a dict
             if not isinstance(value, dict):
-                print(f"Value for '{key}' is not a dictionary")
-                return False
+                raise ValueError(f"Value for '{key}' is not a dictionary")
 
             # Both required keys must exist
             for promptKey in requiredKeys:
                 if promptKey not in value:
-                    print(f"Missing '{promptKey}' in '{key}'")
-                    return False
+                    raise ValueError(f"Missing '{promptKey}' in '{key}'")
 
                 # Each prompt must be a non-empty string
                 if (
                     not isinstance(value[promptKey], str)
                     or not value[promptKey].strip()
                 ):
-                    print(f"'{promptKey}' in '{key}' must be a non-empty string")
-                    return False
-
-        return True
+                    raise ValueError(
+                        f"'{promptKey}' in '{key}' must be a non-empty string"
+                    )
 
     def gatherAndThenAct(self) -> str:
         results = []
@@ -91,10 +88,13 @@ class TeamCoordinator:
             prompts = self.loadJson(orchestratorResult)
 
             # Bad json, we try again
-            if not self.validateAgentPrompts(prompts, ["systemPrompt", "userPrompt"]):
+            try:
+                self.validateAgentPrompts(prompts, ["systemPrompt", "userPrompt"])
+            except ValueError as e:
                 print(
                     f"Invalid JSON, attempting LLM request again...\nAttempt #{attempt + 1} out of {maxAmountOfAttempts}"
                 )
+                print(f"Error details: {e}")
                 continue
 
             # print(prompts)
