@@ -145,6 +145,27 @@ class TestAIAgent(unittest.TestCase):
             ],
         )
 
+    def test_agentRevertPreviousConversationWithNoMessages(self):
+        llmMock = LLM.factory()  # You would replace this with a mock LLMInterface
+        agentName = "TestAgent"
+        systemPrompt = "You are a helpful assistant."
+
+        agent = AIAgent(
+            name=agentName,
+            llm=llmMock,  # You would replace this with a mock LLMInterface
+            systemPrompt=systemPrompt,
+        )
+
+        agent.revertPreviousConversation()
+
+        # After reverting, the last user and assistant messages should be removed, leaving only the system prompt and the first user and assistant messages.
+        self.assertEqual(
+            agent.getMessagesForChat(),
+            [
+                {"role": "system", "content": systemPrompt},
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
