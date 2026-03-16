@@ -50,6 +50,28 @@ class TestAIAgent(unittest.TestCase):
             ],
         )
 
+    def test_agentReset(self):
+        llmMock = LLM.factory()  # You would replace this with a mock LLMInterface
+        agentName = "TestAgent"
+        systemPrompt = "You are a helpful assistant."
+
+        agent = AIAgent(
+            name=agentName,
+            llm=llmMock,  # You would replace this with a mock LLMInterface
+            systemPrompt=systemPrompt,
+        )
+
+        userMessage = "How big is the the Earth?"
+        agent.addMessage("user", userMessage)
+
+        aiResponse = "The Earth is approximately 12,742 kilometers in diameter."
+        agent.addMessage("assistant", aiResponse)
+
+        agent.reset()
+        self.assertEqual(
+            agent.getMessagesForChat(), [{"role": "system", "content": systemPrompt}]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -26,7 +26,7 @@ class AIAgent:
         return self.name
 
     def reset(self) -> None:
-        self.messages = [self.messages[0]]
+        self.messages = []
 
     def getSystemPromptStructured(self) -> dict:
         return {"role": "system", "content": self.systemPrompt + self.extraSystemPrompt}
