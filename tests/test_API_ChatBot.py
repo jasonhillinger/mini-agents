@@ -4,6 +4,9 @@ from fastapi.testclient import TestClient
 from LLM.MOCK_LLM import MOCK_LLM
 from api import app
 import config
+import coverage
+
+coverage.process_startup()
 
 client = TestClient(app)
 

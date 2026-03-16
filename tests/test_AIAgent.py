@@ -3,6 +3,9 @@ from Agents.AIAgent import AIAgent
 from LLM.LLM import LLM
 from LLM.MOCK_LLM import MOCK_LLM
 import config
+import coverage
+
+coverage.process_startup()
 
 
 class TestAIAgent(unittest.TestCase):

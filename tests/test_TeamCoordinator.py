@@ -1,5 +1,8 @@
 import unittest
 from Orchestration.TeamCoordinator import TeamCoordinator
+import coverage
+
+coverage.process_startup()
 
 
 class TestTeamCoordinator(unittest.TestCase):
