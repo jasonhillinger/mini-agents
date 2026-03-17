@@ -46,7 +46,7 @@ options = _loadAPIOptions()
 availableRoutes = {}
 
 
-def create_endpoint(func: Callable):
+def createEndpoint(func: Callable):
     async def endpoint_func(*args, **kwargs):
         return func(*args, **kwargs)
 
@@ -64,7 +64,7 @@ for name, option in options.items():
         getName = f"{name}|GET"
         app.add_api_route(
             endpoint,
-            create_endpoint(getFunc),
+            createEndpoint(getFunc),
             methods=["GET"],
             name=getName,
         )
@@ -74,7 +74,7 @@ for name, option in options.items():
         postName = f"{name}|POST"
         app.add_api_route(
             endpoint,
-            create_endpoint(postFunc),
+            createEndpoint(postFunc),
             methods=["POST"],
             name=postName,
         )
@@ -82,5 +82,5 @@ for name, option in options.items():
 
 
 @app.get("/available-agent-jobs")
-def available_agent_jobs():
+def availableAgentJobs():
     return availableRoutes
