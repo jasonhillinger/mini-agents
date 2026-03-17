@@ -2,7 +2,7 @@ from Agents.AIAgent import AIAgent
 from LLM.LLM import LLM
 from Utils.yamlUtils import getConfigFromYaml
 from pydantic import BaseModel
-from fastapi import HTTPException
+from fastapi import HTTPException, Query
 
 
 class Message(BaseModel):
@@ -37,9 +37,15 @@ def apiPost(data: Request):
     return agent.getMessagesForChat()
 
 
-def apiGet():
+def apiGet(verbose: bool = Query(False)):
     agent = initializeAgent()
-    return agent.getSystemPrompt()
+    if verbose:
+        return {
+            "name": agent.getName(),
+            "systemPrompt": agent.getSystemPrompt(),
+        }
+
+    return {"systemPrompt": agent.getSystemPrompt()}
 
 
 def run() -> None:

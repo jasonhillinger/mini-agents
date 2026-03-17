@@ -52,7 +52,17 @@ class TestAPIChatBot(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         responseData = response.json()
-        self.assertIsInstance(responseData, str)
+        self.assertIsInstance(responseData, dict)
+        self.assertIn("systemPrompt", responseData)
+
+    def test_getVerboseSystemPrompt(self):
+        response = client.get("/run-agent-job/chat-bot", params={"verbose": True})
+
+        self.assertEqual(response.status_code, 200)
+        responseData = response.json()
+        self.assertIsInstance(responseData, dict)
+        self.assertIn("name", responseData)
+        self.assertIn("systemPrompt", responseData)
 
 
 if __name__ == "__main__":
