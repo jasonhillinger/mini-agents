@@ -115,6 +115,35 @@ agents:
 3. Add a `.yaml` config file for agent definitions
 4. The scenario will automatically appear in the interactive menu
 
+### API
+
+The project includes a FastAPI-based REST API that dynamically generates endpoints for each agent job.
+
+#### Running the API Server
+
+To run the server in debug mode with hot reloading:
+```bash
+python3 -m debugpy --listen 5678 -m uvicorn api:app --reload
+```
+
+To run the server normally:
+```bash
+uvicorn api:app --reload
+```
+
+#### Creating API Endpoints
+
+To expose an agent job via the API, add an `apiPost(data: Request)` and/or `apiGet(data: Request)` function to the `runner.py` file in your AgentJob directory. The framework will automatically:
+
+- Discover the function during startup
+- Generate a POST|GET endpoint at `/run-agent-job/{job-name}` (where job-name is derived from the directory name)
+- Handle request validation using Pydantic models
+
+#### Available Endpoints
+
+- `GET /available-agent-jobs` - Returns a list of all available agent job endpoints
+- `POST /run-agent-job/{job-name}` - Execute the specified agent job (dynamically generated)
+
 ## Testing
 
 The project includes comprehensive unit tests:

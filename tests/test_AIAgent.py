@@ -1,15 +1,18 @@
 import unittest
 from Agents.AIAgent import AIAgent
+from LLM.LLM import LLM
 from LLM.MOCK_LLM import MOCK_LLM
+import config
+import coverage
+
+coverage.process_startup()
 
 
 class TestAIAgent(unittest.TestCase):
-    @staticmethod
-    def getMockLLM() -> MOCK_LLM:
-        return MOCK_LLM("abc123", "http://localhost:11434", "MockLLM", 10)
+    config.TEST_MODE_ENABLED = True
 
     def test_agentInitiation(self):
-        llmMock = self.getMockLLM()
+        llmMock = LLM.factory()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
         prompt = "What is the capital of France?"
@@ -29,7 +32,7 @@ class TestAIAgent(unittest.TestCase):
         self.assertEqual(agent.getPrompt(), prompt)
 
     def test_agentMockChat(self):
-        llmMock = self.getMockLLM()
+        llmMock = LLM.factory()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
@@ -53,7 +56,7 @@ class TestAIAgent(unittest.TestCase):
         )
 
     def test_agentGetMessagesForChat(self):
-        llmMock = self.getMockLLM()
+        llmMock = LLM.factory()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
@@ -91,7 +94,7 @@ class TestAIAgent(unittest.TestCase):
         )
 
     def test_agentReset(self):
-        llmMock = self.getMockLLM()
+        llmMock = LLM.factory()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
@@ -110,7 +113,7 @@ class TestAIAgent(unittest.TestCase):
         )
 
     def test_agentRevertPreviousConversation(self):
-        llmMock = self.getMockLLM()
+        llmMock = LLM.factory()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
@@ -151,7 +154,7 @@ class TestAIAgent(unittest.TestCase):
         )
 
     def test_agentRevertPreviousConversationWithNoMessages(self):
-        llmMock = self.getMockLLM()
+        llmMock = LLM.factory()
         agentName = "TestAgent"
         systemPrompt = "You are a helpful assistant."
 
