@@ -133,7 +133,7 @@ uvicorn api:app --reload
 
 #### Creating API Endpoints
 
-To expose an agent job via the API, add an `api(data: Request)` function to the `runner.py` file in your AgentJob directory. The framework will automatically:
+To expose an agent job via the API, add an `apiPost(data: Request)` and/or `apiGet(data: Request)` function to the `runner.py` file in your AgentJob directory. The framework will automatically:
 
 - Discover the function during startup
 - Generate a POST|GET endpoint at `/run-agent-job/{job-name}` (where job-name is derived from the directory name)
