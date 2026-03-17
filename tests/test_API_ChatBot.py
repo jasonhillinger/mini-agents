@@ -47,6 +47,13 @@ class TestAPIChatBot(unittest.TestCase):
         responseData = response.json()
         self.assertEqual(responseData["detail"], "Missing 'messages' field")
 
+    def test_getSystemPrompt(self):
+        response = client.get("/run-agent-job/chat-bot")
+
+        self.assertEqual(response.status_code, 200)
+        responseData = response.json()
+        self.assertIsInstance(responseData, str)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -27,7 +27,7 @@ def initializeAgent() -> AIAgent:
     )
 
 
-def api(data: Request):
+def apiPost(data: Request):
     if len(data.messages) == 0:
         raise HTTPException(status_code=400, detail="Missing 'messages' field")
 
@@ -35,6 +35,11 @@ def api(data: Request):
     agent = initializeAgent()
     agent.chat(message)
     return agent.getMessagesForChat()
+
+
+def apiGet():
+    agent = initializeAgent()
+    return agent.getSystemPrompt()
 
 
 def run() -> None:

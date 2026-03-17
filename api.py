@@ -25,12 +25,13 @@ def _loadAPIOptions() -> dict[str, dict[str, Callable]]:
             if filename == "runner.py":
                 module = importlib.import_module(f"AgentJobs.{directory}.runner")
 
-                if not hasattr(module, "api"):
+                if not hasattr(module, "apiGet") and not hasattr(module, "apiPost"):
                     continue
 
                 options[directory] = {
                     "name": directory,
-                    "func": getattr(module, "api"),
+                    "getFunc": getattr(module, "apiGet", None),
+                    "postFunc": getattr(module, "apiPost", None),
                 }
 
     return options
@@ -55,17 +56,29 @@ def create_endpoint(func: Callable):
 
 
 for name, option in options.items():
-    func = option["func"]
+    getFunc = option["getFunc"]
+    postFunc = option["postFunc"]
     endpoint = formatEndpoint(name)
 
-    availableRoutes[name] = endpoint
+    if getFunc:
+        getName = f"{name}|GET"
+        app.add_api_route(
+            endpoint,
+            create_endpoint(getFunc),
+            methods=["GET"],
+            name=getName,
+        )
+        availableRoutes[getName] = endpoint
 
-    app.add_api_route(
-        endpoint,
-        create_endpoint(func),
-        methods=["POST"],
-        name=name,
-    )
+    if postFunc:
+        postName = f"{name}|POST"
+        app.add_api_route(
+            endpoint,
+            create_endpoint(postFunc),
+            methods=["POST"],
+            name=postName,
+        )
+        availableRoutes[postName] = endpoint
 
 
 @app.get("/available-agent-jobs")
